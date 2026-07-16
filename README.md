@@ -1,5 +1,8 @@
 # Ledger & Seal — Escrow + Reputation Marketplace on Stellar (Soroban)
 
+🚀 **Live Demo:** [https://sorobean-app.vercel.app/](https://sorobean-app.vercel.app/)
+🎥 **Demo Video:** [https://drive.google.com/file/d/1htLCjKnOCQVedV3NMFcoZ4k5wNMabt0y/view?usp=sharing](https://drive.google.com/file/d/1htLCjKnOCQVedV3NMFcoZ4k5wNMabt0y/view?usp=sharing)
+
 A production-shaped, end-to-end Stellar dApp built for the **🟠 Level 3 —
 Orange Belt** submission. Buyers lock funds in an `escrow-contract`; on
 confirmed delivery it releases the payment **and** makes a live
