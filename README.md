@@ -173,13 +173,13 @@ README.
 | Public GitHub repository | *(push this folder, make it public)* |
 | README with complete documentation | this file + `docs/ARCHITECTURE.md` |
 | 10+ meaningful commits | commit contracts, tests, frontend pieces, CI, docs, and deployment scripts as separate commits — see suggested commit plan below |
-| Live demo link | deploy `frontend/` to Vercel/Netlify, paste URL here: `LIVE_DEMO_URL = ` |
-| Contract deployment address | run `scripts/deploy.sh`, paste here: `ESCROW_CONTRACT_ID = CATWHSATPFRSVXUQWPWFCAJSCQK3GXI3SQQQG6X7RW4MHISUTO6BQB44` / `REPUTATION_CONTRACT_ID = CDZPAKNE7OEQCGDIMGBGZ4YOH4XCIGKJ6XIGOIFL64FRP3XEPF3GPBD2` |
+| Live demo link | [https://sorobean-app.vercel.app/](https://sorobean-app.vercel.app/) |
+| Contract deployment address | `ESCROW_CONTRACT_ID = CBCIEKD5Q2QD32IAOMF4PVJR4U4C37S3IHBNOHKLXZZYTWEEF3FKO3YW` / `REPUTATION_CONTRACT_ID = CACFRLD6RU3NTQSIDLHS4PJASRXALNDMBTJHQ3DJIRFFL5NLXWGGLF3X` |
 | Transaction hash for contract interaction | call `create_escrow` or `release` from the UI/CLI, paste the resulting hash here: `SAMPLE_TX_HASH = ` |
 | Screenshot: mobile responsive UI | narrow-viewport screenshot of `frontend/src/app/page.tsx` |
 | Screenshot: CI/CD pipeline running | GitHub Actions tab, green run |
 | Screenshot: test output, 3+ passing | `cargo test --workspace` and/or `npm test` output |
-| Demo video (1–2 min) | follow `docs/DEMO_SCRIPT.md`, paste link here: `DEMO_VIDEO_URL = ` |
+| Demo video (1–2 min) | [Google Drive Link](https://drive.google.com/file/d/1htLCjKnOCQVedV3NMFcoZ4k5wNMabt0y/view?usp=sharing) |
 
 ### Suggested commit plan (10+ meaningful commits)
 
