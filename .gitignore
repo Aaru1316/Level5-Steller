@@ -1,7 +1,6 @@
 # Rust / Soroban
 /target
 **/*.rs.bk
-Cargo.lock
 
 # Node / Next.js
 frontend/node_modules
