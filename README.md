@@ -37,16 +37,16 @@ score updates atomically, in the same transaction.
 Here are the screenshots demonstrating the application's functionality and builds:
 
 ### 1. Wallet Connection
-![Wallet Connection](./docs/screenshots/wallet_connect.png)
+![alt text](image.png)
 
 ### 2. Mobile Responsive UI
-![Mobile UI](./docs/screenshots/mobile_ui.png)
+![alt text](image-1.png)
 
 ### 3. Transaction Confirmation
-![Transaction Confirmation](./docs/screenshots/transaction.png)
+![alt text](image-2.png)
 
 ### 4. CI/CD Pipeline
-![CI/CD Pipeline](./docs/screenshots/ci_pipeline.png)
+![alt text](image-3.png)
 
 ---
 
