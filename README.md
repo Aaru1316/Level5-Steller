@@ -80,30 +80,21 @@ way, how atomicity/auth work across the call, and the event-streaming design.
 
 ## Frontend
 
-`frontend/` is a Next.js 14 (App Router) + TypeScript + Tailwind app.
+`frontend/` is a Vite + React + TypeScript + Tailwind app.
 
-- **Wallet:** Freighter, via `src/hooks/useWallet.ts` (connect/disconnect,
-  install-prompt fallback, signing).
-- **Contract calls:** `src/lib/soroban.ts` — simulate → sign → submit → poll
-  until confirmed, wrapped in a typed `ContractCallError`.
-- **Real-time updates:** `src/hooks/useEscrows.ts` polls `getEvents` every
-  5s and merges changes into the escrow list without a manual refresh.
-- **Design system:** "Ledger & Seal" — ink/brass/parchment palette, Fraunces
-  display + Inter body + IBM Plex Mono for addresses/amounts, and a signature
-  wax-seal `StatusSeal` component that encodes escrow state as a stamp.
-- **Responsive:** single-column stacked layout under `sm`, two-column
-  form/manifest split from `lg` up (`src/app/page.tsx`).
-- **Error & loading states:** field-level form validation
-  (`CreateEscrowForm`), skeleton rows while the manifest loads
-  (`EscrowManifest`), disabled/labelled buttons mid-transaction, inline
-  `role="alert"` error banners.
+- **Wallet:** Freighter, via `src/hooks/useWallet.ts` (connect/disconnect, install-prompt fallback, signing).
+- **Contract calls:** `src/lib/soroban.ts` — build → simulate → assemble → sign → submit → poll until confirmed.
+- **Jobs & State:** `src/hooks/useJobs.ts` coordinates job state, fetching job and reputation details via Soroban simulations.
+- **Design system:** "SkillEscrow" — ink/brass/parchment palette, modern typography, and structured components like `ReputationBadge` and `JobList`.
+- **Responsive:** single-column stacked layout under `lg`, two-column form/manifest split from `lg` up (`src/App.tsx`).
+- **Error & loading states:** field-level form validation (`CreateJobForm`), skeleton rows while the manifest loads (`JobList`), disabled/labelled buttons mid-transaction, inline error banners.
 
 ### Running locally
 
 ```bash
 cd frontend
 npm install
-cp .env.example .env.local   # fill in contract IDs after deployment
+cp .env.production .env.local   # fill in contract IDs after deployment
 npm run dev
 ```
 
@@ -123,17 +114,14 @@ Covers (9 tests total):
   call, dispute refund penalizes reputation, double-release is rejected,
   only the buyer can release
 
-**Frontend** (Jest + React Testing Library):
+**Frontend** (Vitest + React Testing Library):
 
 ```bash
 cd frontend
 npm test
 ```
 
-Covers (8 tests across 3 files): form validation + successful submit +
-disabled-while-submitting state (`CreateEscrowForm`), all four status seal
-states (`StatusSeal`), empty/loading/buyer-only-release states
-(`EscrowManifest`).
+Covers: form validation + successful submit + disabled-while-submitting state (`CreateJobForm`), and connect button + wallet connect callback handling (`WalletButton`).
 
 > Take your "3+ passing tests" screenshot from either `cargo test --workspace`
 > or `npm test` output (or both) — see checklist below.
@@ -178,7 +166,7 @@ README.
 | Live demo link | deploy `frontend/` to Vercel/Netlify, paste URL here: `LIVE_DEMO_URL = ` |
 | Contract deployment address | run `scripts/deploy.sh`, paste here: `ESCROW_CONTRACT_ID = CATWHSATPFRSVXUQWPWFCAJSCQK3GXI3SQQQG6X7RW4MHISUTO6BQB44` / `REPUTATION_CONTRACT_ID = CDZPAKNE7OEQCGDIMGBGZ4YOH4XCIGKJ6XIGOIFL64FRP3XEPF3GPBD2` |
 | Transaction hash for contract interaction | call `create_escrow` or `release` from the UI/CLI, paste the resulting hash here: `SAMPLE_TX_HASH = ` |
-| Screenshot: mobile responsive UI | narrow-viewport screenshot of `frontend/src/app/page.tsx` |
+| Screenshot: mobile responsive UI | narrow-viewport screenshot of `frontend/src/App.tsx` |
 | Screenshot: CI/CD pipeline running | GitHub Actions tab, green run |
 | Screenshot: test output, 3+ passing | `cargo test --workspace` and/or `npm test` output |
 | Demo video (1–2 min) | follow `docs/DEMO_SCRIPT.md`, paste link here: `DEMO_VIDEO_URL = ` |
@@ -203,15 +191,16 @@ README.
 
 ```
 contracts/
-  escrow/            # escrow-contract crate + tests
-  reputation/         # reputation-contract crate + tests
+  escrow_contract/       # escrow-contract crate + tests
+  reputation_contract/   # reputation-contract crate + tests
 frontend/
-  src/app/            # Next.js pages/layout
-  src/components/      # WalletButton, StatusSeal, forms, manifest list
-  src/hooks/           # useWallet, useEscrows (contract calls + event polling)
-  src/lib/soroban.ts   # simulate/sign/submit/poll helper
-  __tests__/           # Jest + RTL tests
-scripts/deploy.sh      # Testnet deployment workflow
-.github/workflows/     # CI pipeline
-docs/                  # architecture + demo script
+  src/                   # Vite React source code
+    App.tsx              # main app view and logic
+    components/          # WalletButton, CreateJobForm, JobList, ReputationBadge
+    hooks/               # useWallet, useJobs
+    lib/soroban.ts       # simulate/sign/submit/poll helper
+    __tests__/           # Vitest + RTL tests
+scripts/deploy.sh        # Testnet deployment workflow
+.github/workflows/       # CI pipeline
+docs/                    # architecture + demo script
 ```
