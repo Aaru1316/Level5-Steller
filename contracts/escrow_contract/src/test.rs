@@ -24,7 +24,7 @@ struct TestCtx {
     token: token::Client<'static>,
     client: Address,
     freelancer: Address,
-    admin: Address,
+    _admin: Address,
 }
 
 fn setup() -> TestCtx {
@@ -54,7 +54,7 @@ fn setup() -> TestCtx {
         token: token_client,
         client: client_addr,
         freelancer: freelancer_addr,
-        admin,
+        _admin: admin,
     }
 }
 

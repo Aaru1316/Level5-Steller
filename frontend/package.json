@@ -31,5 +31,9 @@
     "typescript": "^5.7.2",
     "vite": "^8.1.1",
     "vitest": "^4.1.10"
+  },
+  "optionalDependencies": {
+    "@oxlint/binding-linux-x64-gnu": "^1.71.0",
+    "@oxlint/binding-win32-x64-msvc": "^1.71.0"
   }
 }
