@@ -5,6 +5,9 @@ import { WalletButton } from "./components/WalletButton";
 import { CreateJobForm } from "./components/CreateJobForm";
 import type { JobFormData } from "./components/CreateJobForm";
 import { JobList } from "./components/JobList";
+import type { JobItem } from "./components/JobList";
+import { NetworkGuard } from "./components/NetworkGuard";
+import { FeedbackBanner } from "./components/FeedbackBanner";
 import {
   callContractMethod,
   ESCROW_CONTRACT_ID,
@@ -21,6 +24,7 @@ export default function App() {
   const [activeJobId, setActiveJobId] = useState<number | null>(null);
   const [txError, setTxError] = useState<string | null>(null);
   const [txSuccess, setTxSuccess] = useState<string | null>(null);
+  const [optimisticJobs, setOptimisticJobs] = useState<JobItem[]>([]);
 
   // Helper to clear alerts after a timeout
   const setTimedAlerts = (successMsg: string | null, errorMsg: string | null) => {
@@ -37,6 +41,23 @@ export default function App() {
     setIsSubmitting(true);
     setTxError(null);
     setTxSuccess(null);
+
+    // Optimistic UI: Create temporary pending job
+    const tempId = Date.now();
+    const pendingJob: JobItem = {
+      id: tempId,
+      client: address,
+      freelancer: data.freelancer,
+      token: data.token,
+      amount: data.amount,
+      description: data.description,
+      deadline: Math.floor(new Date(data.deadlineDate).getTime() / 1000),
+      status: "Pending",
+      rated: false,
+      isPending: true,
+    };
+
+    setOptimisticJobs((prev) => [pendingJob, ...prev]);
 
     try {
       // 1. Parse budget into stroops (Stellar token units with 7 decimals)
@@ -58,12 +79,14 @@ export default function App() {
       // 4. Invoke contract
       await callContractMethod(address, ESCROW_CONTRACT_ID, "create_job", args, sign);
       
-      setTimedAlerts("Gig listing created successfully!", null);
+      setTimedAlerts("Gig listing submitted & created on-chain!", null);
       await refreshJobs();
     } catch (err) {
       console.error(err);
       setTimedAlerts(null, err instanceof Error ? err.message : "Failed to create job.");
     } finally {
+      // Remove optimistic pending job after on-chain call completes
+      setOptimisticJobs((prev) => prev.filter((j) => j.id !== tempId));
       setIsSubmitting(false);
     }
   };
@@ -96,7 +119,7 @@ export default function App() {
     try {
       const args = [nativeToScVal(BigInt(jobId), { type: "u64" })];
       await callContractMethod(address, ESCROW_CONTRACT_ID, "complete_job", args, sign);
-      setTimedAlerts(`Job #${jobId} completed. Payment released!`, null);
+      setTimedAlerts(`Job #${jobId} completed. Payment released & seller reputation updated!`, null);
       await refreshJobs();
     } catch (err) {
       console.error(err);
@@ -148,20 +171,24 @@ export default function App() {
   };
 
   const isConfigured = ESCROW_CONTRACT_ID !== "";
+  const combinedJobs = [...optimisticJobs, ...jobs];
 
   return (
-    <div className="min-h-screen bg-ink-900 text-parchment-100 flex flex-col">
+    <div className="min-h-screen bg-ink-900 text-parchment-100 flex flex-col font-sans">
       {/* Header Bar */}
       <header className="border-b border-brass-500/15 bg-ink-900/60 backdrop-blur sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center gap-4">
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black tracking-tight text-brass-400">SkillEscrow</h1>
+              <h1 className="text-2xl font-black tracking-tight text-brass-400">Ledger & Seal</h1>
               <span className="bg-brass-500/10 text-brass-400 border border-brass-500/25 px-2 py-0.5 rounded-full text-3xs font-bold uppercase tracking-wider font-mono">
-                Testnet
+                Stellar Testnet
+              </span>
+              <span className="bg-mint-500/10 text-mint-400 border border-mint-500/25 px-2 py-0.5 rounded-full text-3xs font-bold uppercase tracking-wider font-mono">
+                Level 5 — Blue Belt
               </span>
             </div>
-            <p className="text-xs text-ink-400 font-medium"> freelance-gig escrow marketplace with on-chain reputation</p>
+            <p className="text-xs text-ink-400 font-medium">Escrow + Portable On-Chain Reputation Marketplace</p>
           </div>
           <WalletButton
             address={wallet.address}
@@ -177,6 +204,12 @@ export default function App() {
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-8 flex flex-col gap-6">
         
+        {/* Network Guard Warning Banner */}
+        <NetworkGuard />
+
+        {/* User Feedback & Onboarding Survey Banner */}
+        <FeedbackBanner />
+
         {/* Global Configuration Check Banner */}
         {!isConfigured && (
           <div className="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-seal text-xs text-yellow-400 font-medium">
@@ -186,8 +219,16 @@ export default function App() {
 
         {/* Transaction Alerts */}
         {txSuccess && (
-          <div className="bg-mint-500/10 border border-mint-500/30 p-4 rounded-seal text-sm text-mint-500 font-bold animate-fade-in shadow-lg">
-            ✓ {txSuccess}
+          <div className="bg-mint-500/10 border border-mint-500/30 p-4 rounded-seal text-sm text-mint-500 font-bold animate-fade-in shadow-lg flex items-center justify-between">
+            <span>✓ {txSuccess}</span>
+            <a
+              href="https://stellar.expert/explorer/testnet"
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs underline text-mint-400 hover:text-mint-300 font-mono"
+            >
+              Verify on Explorer ↗
+            </a>
           </div>
         )}
         {txError && (
@@ -215,16 +256,16 @@ export default function App() {
           {/* Active Manifest Panel */}
           <div className="lg:col-span-7 flex flex-col gap-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold tracking-tight text-parchment-200">Active Gigs</h2>
+              <h2 className="text-2xl font-bold tracking-tight text-parchment-200">Escrow Manifest</h2>
               <button
                 onClick={refreshJobs}
                 className="text-xs font-semibold text-brass-400 hover:text-brass-300 transition"
               >
-                Refresh List
+                ↻ Refresh List
               </button>
             </div>
 
-            {loading ? (
+            {loading && combinedJobs.length === 0 ? (
               <div className="flex flex-col gap-4">
                 {[1, 2, 3].map((n) => (
                   <div key={n} className="bg-ink-800/10 border border-brass-500/5 p-6 rounded-seal animate-pulse flex flex-col gap-3">
@@ -240,7 +281,7 @@ export default function App() {
               </div>
             ) : (
               <JobList
-                jobs={jobs}
+                jobs={combinedJobs}
                 walletAddress={address}
                 onFund={handleFundJob}
                 onComplete={handleCompleteJob}
