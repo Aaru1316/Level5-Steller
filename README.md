@@ -85,16 +85,16 @@ Level 5 shifts **Ledger & Seal** from MVP validation to 50+ testnet user growth,
 Here are the screenshots demonstrating application functionality, builds, and pipeline runs:
 
 ### 1. Wallet Connection & Main UI
-![Wallet Connection](image.png)
+![Wallet Connection](image-4.png)
 
 ### 2. Mobile Responsive Viewport
-![Mobile Viewport](image-1.png)
+![Mobile Viewport](image-5.png)
 
 ### 3. Transaction Confirmation & Stellar Explorer
-![Transaction Confirmation](image-2.png)
+![Transaction Confirmation](image-7.png)
 
 ### 4. CI/CD Pipeline Execution
-![CI/CD Pipeline](image-3.png)
+![CI/CD Pipeline](image-6.png)
 
 ---
 
