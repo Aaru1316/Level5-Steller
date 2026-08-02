@@ -46,11 +46,13 @@ impl ReputationContract {
         }
         admin.require_auth();
         env.storage().instance().set(&ADMIN_KEY, &admin);
-        env.storage().instance().set(&CALLER_KEY, &authorized_caller);
-        
+        env.storage()
+            .instance()
+            .set(&CALLER_KEY, &authorized_caller);
+
         // Extend instance storage TTL
         env.storage().instance().extend_ttl(1000, 5000);
-        
+
         Ok(())
     }
 
@@ -77,20 +79,16 @@ impl ReputationContract {
         env.storage().instance().extend_ttl(1000, 5000);
 
         let key = DataKey::Reputation(freelancer.clone());
-        let mut rep = env
-            .storage()
-            .persistent()
-            .get(&key)
-            .unwrap_or(Reputation {
-                total_score: 0,
-                rating_count: 0,
-            });
+        let mut rep = env.storage().persistent().get(&key).unwrap_or(Reputation {
+            total_score: 0,
+            rating_count: 0,
+        });
 
         rep.total_score += score;
         rep.rating_count += 1;
 
         env.storage().persistent().set(&key, &rep);
-        
+
         // Extend persistent storage TTL
         env.storage().persistent().extend_ttl(&key, 1000, 5000);
 

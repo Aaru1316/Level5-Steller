@@ -111,10 +111,8 @@ impl EscrowContract {
         env.storage().instance().set(&NEXT_ID_KEY, &(id + 1));
 
         // Emit job_created event
-        env.events().publish(
-            (symbol_short!("created"), id),
-            (client, freelancer, amount),
-        );
+        env.events()
+            .publish((symbol_short!("created"), id), (client, freelancer, amount));
 
         Ok(id)
     }
@@ -134,16 +132,14 @@ impl EscrowContract {
         token_client.transfer(&job.client, &env.current_contract_address(), &job.amount);
 
         job.status = Status::Funded;
-        
+
         let key = DataKey::Job(job_id);
         env.storage().persistent().set(&key, &job);
         env.storage().persistent().extend_ttl(&key, 1000, 5000);
 
         // Emit job_funded event
-        env.events().publish(
-            (symbol_short!("funded"), job_id),
-            (job.client, job.amount),
-        );
+        env.events()
+            .publish((symbol_short!("funded"), job_id), (job.client, job.amount));
 
         Ok(())
     }
@@ -160,19 +156,21 @@ impl EscrowContract {
 
         // Transfer funds from contract to freelancer
         let token_client = token::Client::new(&env, &job.token);
-        token_client.transfer(&env.current_contract_address(), &job.freelancer, &job.amount);
+        token_client.transfer(
+            &env.current_contract_address(),
+            &job.freelancer,
+            &job.amount,
+        );
 
         job.status = Status::Completed;
-        
+
         let key = DataKey::Job(job_id);
         env.storage().persistent().set(&key, &job);
         env.storage().persistent().extend_ttl(&key, 1000, 5000);
 
         // Emit job_completed event
-        env.events().publish(
-            (symbol_short!("completed"), job_id),
-            job.freelancer.clone(),
-        );
+        env.events()
+            .publish((symbol_short!("completed"), job_id), job.freelancer.clone());
 
         Ok(())
     }
@@ -196,16 +194,14 @@ impl EscrowContract {
         token_client.transfer(&env.current_contract_address(), &job.client, &job.amount);
 
         job.status = Status::Refunded;
-        
+
         let key = DataKey::Job(job_id);
         env.storage().persistent().set(&key, &job);
         env.storage().persistent().extend_ttl(&key, 1000, 5000);
 
         // Emit job_refunded event
-        env.events().publish(
-            (symbol_short!("refunded"), job_id),
-            job.client.clone(),
-        );
+        env.events()
+            .publish((symbol_short!("refunded"), job_id), job.client.clone());
 
         Ok(())
     }
@@ -261,7 +257,7 @@ impl EscrowContract {
             .persistent()
             .get(&key)
             .ok_or(EscrowError::NotFound)?;
-            
+
         env.storage().persistent().extend_ttl(&key, 1000, 5000);
         Ok(job)
     }

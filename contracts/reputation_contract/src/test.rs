@@ -2,12 +2,12 @@
 
 use super::*;
 use soroban_sdk::testutils::Address as _;
-use soroban_sdk::{Env, Address, testutils::MockAuth, testutils::MockAuthInvoke, IntoVal};
+use soroban_sdk::{testutils::MockAuth, testutils::MockAuthInvoke, Address, Env, IntoVal};
 
 fn setup() -> (Env, ReputationContractClient<'static>, Address, Address) {
     let env = Env::default();
     env.mock_all_auths();
-    
+
     let contract_id = env.register_contract(None, ReputationContract);
     let client = ReputationContractClient::new(&env, &contract_id);
 
@@ -66,7 +66,7 @@ fn test_invalid_score_rejected() {
 #[test]
 fn test_unauthorized_caller_rejected() {
     let env = Env::default();
-    
+
     let contract_id = env.register_contract(None, ReputationContract);
     let client = ReputationContractClient::new(&env, &contract_id);
 
@@ -86,7 +86,7 @@ fn test_unauthorized_caller_rejected() {
         },
     }]);
     client.initialize(&admin, &escrow_caller);
-    
+
     // Mock the stranger's authorization for add_rating.
     // The contract expects authorized_caller (escrow_caller) to authorize the call.
     // Since we only mock stranger's auth, it should fail.

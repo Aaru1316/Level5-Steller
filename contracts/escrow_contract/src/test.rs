@@ -153,7 +153,7 @@ fn test_cannot_rate_twice() {
 
     // Rate first time
     ctx.escrow.submit_rating(&job_id, &4);
-    
+
     // Rating again should fail
     let rating_attempt = ctx.escrow.try_submit_rating(&job_id, &5);
     assert!(rating_attempt.is_err());
